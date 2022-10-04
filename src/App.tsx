@@ -1,25 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import { Form } from "./components/Form";
+import { Tasks } from "./components/Tasks";
+
+import { addTask, addTaskAsync } from "./features/todo/todoSlice";
+import { useAppSelector, useAppDispatch } from "./hooks";
 
 function App() {
+  const [textAreaValue, setTextAreaValue] = useState<string | undefined>();
+
+  const tasks = useAppSelector((state) => state.todotasks.tasks);
+  const dispatch = useAppDispatch();
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    dispatch(addTask(textAreaValue));
+    console.log({
+      id: 0,
+      message: textAreaValue,
+    });
+    setTextAreaValue("");
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <section className="tasks">
+      <div>
+        <Form
+          onSubmit={handleSubmit}
+          onTextAreaChange={(value) => {
+            setTextAreaValue(value || undefined);
+          }}
+          textAreaValue={textAreaValue}
+          onGetClick={() => {
+            dispatch(addTaskAsync(textAreaValue || undefined));
+          }}
+        />
+      </div>
+      <Tasks tasks={tasks} />
+    </section>
   );
 }
 
